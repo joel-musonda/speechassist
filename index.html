@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>VoiceAssist - Speech Assistance App</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #5d5cde;
+        --primary-dark: #4b4ab2;
+        --primary-light: #7d7ce6;
+        --success-color: #10b981;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --info-color: #3b82f6;
+        --transition-speed: 0.3s;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg-color: #181818;
+          --text-color: #ffffff;
+          --card-bg: #2d2d2d;
+          --input-bg: #3d3d3d;
+          --border-color: #4d4d4d;
+        }
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg-color: #ffffff;
+          --text-color: #333333;
+          --card-bg: #f9fafb;
+          --input-bg: #f3f4f6;
+          --border-color: #e5e7eb;
+        }
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color var(--transition-speed),
+          color var(--transition-speed);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .app-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        max-width: 100%;
+        margin: 0 auto;
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all var(--transition-speed);
+        overflow: hidden;
+      }
+
+      .card:hover {
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .btn {
+        transition: all var(--transition-speed);
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-dark);
+      }
+
+      .btn-success {
+        background-color: var(--success-color);
+        color: white;
+        border: none;
+      }
+
+      .btn-success:hover {
+        background-color: #0da271;
+      }
+
+      .btn-outline {
+        background-color: transparent;
+        border: 2px solid var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      .btn-outline:hover {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      input,
+      textarea,
+      select {
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        font-size: 1rem;
+        transition: border-color var(--transition-speed);
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(93, 92, 222, 0.25);
+      }
+
+      /* Splash animations */
+      .splash-logo {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.5s forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .slide-up {
+        animation: slideUp 0.5s forwards;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* Speech categories and buttons */
+      .category-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .speech-category {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        background-color: var(--card-bg);
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        transition: all var(--transition-speed);
+      }
+
+      .speech-category:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+      }
+
+      .speech-category i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+      }
+
+      .speech-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .speech-button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        background-color: var(--card-bg);
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        transition: all var(--transition-speed);
+        text-align: center;
+        height: 100px;
+      }
+
+      .speech-button:hover {
+        border-color: var(--primary-color);
+        background-color: var(--primary-light);
+        color: white;
+      }
+
+      .speech-button i {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .speech-button:hover i {
+        color: white;
+      }
+
+      .speech-button.active {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-dark);
+      }
+
+      .speech-button.active i {
+        color: white;
+      }
+
+      /* Loading animation */
+      .loading-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 4rem;
+      }
+
+      .loading-spinner {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        border: 4px solid var(--primary-light);
+        border-top-color: var(--primary-color);
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Toast notification */
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        background-color: var(--card-bg);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
+
+      .toast.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .toast.success {
+        border-left: 4px solid var(--success-color);
+      }
+
+      .toast.error {
+        border-left: 4px solid var(--danger-color);
+      }
+
+      .toast.info {
+        border-left: 4px solid var(--info-color);
+      }
+
+      .toast i {
+        margin-right: 0.75rem;
+        font-size: 1.25rem;
+      }
+
+      /* Modal styles */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity var(--transition-speed),
+          visibility var(--transition-speed);
+      }
+
+      .modal.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        background-color: var(--bg-color);
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transform: translateY(20px);
+        transition: transform var(--transition-speed);
+      }
+
+      .modal.show .modal-content {
+        transform: translateY(0);
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      /* Navbar */
+      .navbar {
+        background-color: var(--card-bg);
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.75rem 1rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+      }
+
+      .navbar-brand i {
+        margin-right: 0.5rem;
+      }
+
+      /* User profile */
+      .user-profile {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        cursor: pointer;
+        border-radius: 0.5rem;
+        transition: background-color var(--transition-speed);
+      }
+
+      .user-profile:hover {
+        background-color: var(--input-bg);
+      }
+
+      .user-profile img {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 0.75rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Splash screen -->
+      <div
+        id="splash-screen"
+        class="fixed inset-0 flex flex-col items-center justify-center bg-indigo-600 z-50"
+      >
+        <div class="splash-logo text-white text-center">
+          <i class="fas fa-comment-dots text-6xl mb-4"></i>
+          <h1 class="text-4xl font-bold mb-2">VoiceAssist</h1>
+          <p class="text-xl">Giving Voice to Everyone</p>
+        </div>
+        <div class="mt-8">
+          <div class="loading-spinner border-white border-t-white"></div>
+        </div>
+      </div>
+
+      <!-- Auth screens -->
+      <div
+        id="auth-screen"
+        class="hidden min-h-screen flex flex-col items-center justify-center p-4"
+      >
+        <div class="max-w-md w-full">
+          <div class="text-center mb-8">
+            <i class="fas fa-comment-dots text-5xl text-indigo-600 mb-3"></i>
+            <h1 class="text-3xl font-bold">VoiceAssist</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">
+              Empowering communication for everyone
+            </p>
+          </div>
+
+          <div class="card p-6">
+            <!-- Auth tabs -->
+            <div
+              class="flex mb-6 border-b border-gray-200 dark:border-gray-700"
+            >
+              <button
+                id="login-tab"
+                class="flex-1 py-3 text-center font-medium border-b-2 border-indigo-600 text-indigo-600"
+              >
+                Log In
+              </button>
+              <button
+                id="register-tab"
+                class="flex-1 py-3 text-center font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                Register
+              </button>
+            </div>
+
+            <!-- Login form -->
+            <form id="login-form">
+              <div class="form-group">
+                <label for="login-email" class="form-label">Email</label>
+                <input
+                  type="email"
+                  id="login-email"
+                  placeholder="Enter your email"
+                  class="text-base"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="login-password" class="form-label">Password</label>
+                <input
+                  type="password"
+                  id="login-password"
+                  placeholder="Enter your password"
+                  class="text-base"
+                  required
+                />
+              </div>
+              <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center">
+                  <input type="checkbox" id="remember-me" class="mr-2" />
+                  <label for="remember-me" class="text-sm">Remember me</label>
+                </div>
+                <a href="#" class="text-sm text-indigo-600 hover:underline"
+                  >Forgot password?</a
+                >
+              </div>
+              <button type="submit" class="btn btn-primary w-full">
+                Log In
+              </button>
+            </form>
+
+            <!-- Register form -->
+            <form id="register-form" class="hidden">
+              <div class="form-group">
+                <label for="register-name" class="form-label">Full Name</label>
+                <input
+                  type="text"
+                  id="register-name"
+                  placeholder="Enter your full name"
+                  class="text-base"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="register-email" class="form-label">Email</label>
+                <input
+                  type="email"
+                  id="register-email"
+                  placeholder="Enter your email"
+                  class="text-base"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="register-password" class="form-label"
+                  >Password</label
+                >
+                <input
+                  type="password"
+                  id="register-password"
+                  placeholder="Create a password"
+                  class="text-base"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="user-details" class="form-label"
+                  >Tell us about yourself</label
+                >
+                <textarea
+                  id="user-details"
+                  placeholder="Details that might help us personalize your experience (age, communication needs, etc.)"
+                  rows="3"
+                  class="text-base"
+                  required
+                ></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-full">
+                Create Account
+              </button>
+            </form>
+
+            <div class="mt-6 text-center">
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                By signing in, you agree to our
+                <a href="#" class="text-indigo-600 hover:underline">Terms</a>
+                and
+                <a href="#" class="text-indigo-600 hover:underline"
+                  >Privacy Policy</a
+                >
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-6 text-center">
+            <button
+              id="demo-btn"
+              class="text-indigo-600 hover:underline font-medium"
+            >
+              Try Demo Version
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main app screen -->
+      <div id="app-screen" class="hidden flex-grow flex flex-col">
+        <!-- Navigation bar -->
+        <nav class="navbar flex justify-between items-center">
+          <div class="navbar-brand">
+            <i class="fas fa-comment-dots"></i>
+            <span>VoiceAssist</span>
+          </div>
+          <div class="flex items-center">
+            <button id="add-category-btn" class="mr-3 btn btn-outline p-2">
+              <i class="fas fa-plus mr-1"></i>
+              <span class="hidden sm:inline">Add Category</span>
+            </button>
+            <div class="user-profile" id="user-profile">
+              <img
+                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+                alt="User Profile"
+              />
+              <span class="hidden sm:block font-medium">Demo User</span>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Main content -->
+        <div class="flex-grow p-4">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold mb-2">Communication Dashboard</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              Select a category or use the quick access buttons below
+            </p>
+          </div>
+
+          <!-- Recent/Quick access buttons -->
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">Quick Access</h3>
+            <div class="speech-buttons" id="quick-access-buttons">
+              <!-- Buttons will be added dynamically -->
+            </div>
+          </div>
+
+          <!-- Categories -->
+          <div>
+            <h3 class="text-lg font-semibold mb-3">Categories</h3>
+            <div class="category-container" id="categories-container">
+              <!-- Categories will be added dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected category view -->
+        <div id="category-view" class="hidden flex-grow p-4">
+          <div class="flex items-center mb-6">
+            <button id="back-to-categories" class="btn p-2 mr-3">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="text-2xl font-bold" id="category-title">
+              Category Name
+            </h2>
+          </div>
+
+          <div class="speech-buttons" id="category-buttons">
+            <!-- Buttons will be added dynamically -->
+          </div>
+
+          <div class="mt-6 flex justify-center">
+            <button id="add-button-btn" class="btn btn-primary">
+              <i class="fas fa-plus mr-2"></i>
+              Add New Button
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Suggestions -->
+        <div id="ai-suggestions" class="hidden flex-grow p-4">
+          <div class="flex items-center mb-6">
+            <button id="back-from-ai" class="btn p-2 mr-3">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="text-2xl font-bold">AI Suggestions</h2>
+          </div>
+
+          <div class="card p-4 mb-6">
+            <p class="mb-4">
+              Based on your profile, we recommend adding these buttons to help
+              with your communication needs:
+            </p>
+            <div id="loading-suggestions" class="loading-indicator">
+              <div class="loading-spinner"></div>
+            </div>
+            <div id="suggestion-buttons" class="speech-buttons hidden">
+              <!-- AI suggestions will be added here -->
+            </div>
+          </div>
+
+          <div class="card p-4">
+            <h3 class="text-lg font-semibold mb-3">Ask AI for suggestions</h3>
+            <div class="form-group">
+              <label for="ai-prompt" class="form-label"
+                >Describe what kind of buttons you need:</label
+              >
+              <textarea
+                id="ai-prompt"
+                rows="3"
+                placeholder="Example: I need buttons for ordering at a restaurant"
+                class="text-base"
+              ></textarea>
+            </div>
+            <button id="get-ai-suggestions" class="btn btn-primary">
+              <i class="fas fa-robot mr-2"></i>
+              Get Suggestions
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Category Modal -->
+      <div id="add-category-modal" class="modal">
+        <div class="modal-content">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold">Add New Category</h3>
+            <button
+              class="close-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <form id="add-category-form">
+            <div class="form-group">
+              <label for="category-name" class="form-label"
+                >Category Name</label
+              >
+              <input
+                type="text"
+                id="category-name"
+                placeholder="Enter category name"
+                class="text-base"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="category-icon" class="form-label">Icon</label>
+              <select id="category-icon" class="text-base" required>
+                <option value="utensils">Food & Drink</option>
+                <option value="heart">Feelings</option>
+                <option value="home">Home</option>
+                <option value="car">Transportation</option>
+                <option value="medkit">Health</option>
+                <option value="user-friends">People</option>
+                <option value="store">Shopping</option>
+                <option value="comments">Conversation</option>
+                <option value="map-marker-alt">Places</option>
+                <option value="calendar-alt">Schedule</option>
+                <option value="graduation-cap">Education</option>
+                <option value="briefcase">Work</option>
+                <option value="gamepad">Entertainment</option>
+                <option value="palette">Art</option>
+              </select>
+            </div>
+            <div class="flex justify-end mt-6">
+              <button type="button" class="btn btn-outline mr-3 close-modal">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Create Category
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Add Button Modal -->
+      <div id="add-button-modal" class="modal">
+        <div class="modal-content">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold">Add New Button</h3>
+            <button
+              class="close-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <form id="add-button-form">
+            <div class="form-group">
+              <label for="button-text" class="form-label">Button Text</label>
+              <input
+                type="text"
+                id="button-text"
+                placeholder="Enter text to speak"
+                class="text-base"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="button-icon" class="form-label">Icon</label>
+              <select id="button-icon" class="text-base" required>
+                <option value="utensils">Food</option>
+                <option value="glass-water">Water</option>
+                <option value="mug-hot">Coffee/Tea</option>
+                <option value="toilet">Bathroom</option>
+                <option value="bed">Sleep</option>
+                <option value="smile">Happy</option>
+                <option value="frown">Sad</option>
+                <option value="angry">Angry</option>
+                <option value="hand">Help</option>
+                <option value="clock">Time</option>
+                <option value="phone">Phone</option>
+                <option value="tv">TV</option>
+                <option value="music">Music</option>
+                <option value="book">Book</option>
+                <option value="temperature-high">Hot</option>
+                <option value="temperature-low">Cold</option>
+                <option value="pills">Medicine</option>
+                <option value="ambulance">Emergency</option>
+                <option value="thumbs-up">Yes</option>
+                <option value="thumbs-down">No</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="button-voice" class="form-label">Voice</label>
+              <select id="button-voice" class="text-base">
+                <option value="Sarah">Sarah (Female)</option>
+                <option value="George">George (Male)</option>
+                <option value="Jessica">Jessica (Female)</option>
+                <option value="Brian">Brian (Male)</option>
+                <option value="Lily">Lily (Female)</option>
+              </select>
+            </div>
+            <div class="flex justify-end mt-6">
+              <button type="button" class="btn btn-outline mr-3 close-modal">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Create Button
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Toast notification -->
+      <div id="toast" class="toast">
+        <i class="fas fa-check-circle text-green-500"></i>
+        <span id="toast-message">Operation successful!</span>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // App state
+        const appState = {
+          currentUser: null,
+          categories: [],
+          quickAccessButtons: [],
+          selectedCategory: null,
+          defaultVoice: "Sarah",
+          isDemo: false,
+        };
+
+        // DOM Elements
+        const splashScreen = document.getElementById("splash-screen");
+        const authScreen = document.getElementById("auth-screen");
+        const appScreen = document.getElementById("app-screen");
+        const loginTab = document.getElementById("login-tab");
+        const registerTab = document.getElementById("register-tab");
+        const loginForm = document.getElementById("login-form");
+        const registerForm = document.getElementById("register-form");
+        const demoBtn = document.getElementById("demo-btn");
+        const addCategoryBtn = document.getElementById("add-category-btn");
+        const categoriesContainer = document.getElementById(
+          "categories-container"
+        );
+        const categoryView = document.getElementById("category-view");
+        const categoryTitle = document.getElementById("category-title");
+        const categoryButtons = document.getElementById("category-buttons");
+        const backToCategoriesBtn =
+          document.getElementById("back-to-categories");
+        const addButtonBtn = document.getElementById("add-button-btn");
+        const quickAccessButtons = document.getElementById(
+          "quick-access-buttons"
+        );
+        const addCategoryModal = document.getElementById("add-category-modal");
+        const addButtonModal = document.getElementById("add-button-modal");
+        const addCategoryForm = document.getElementById("add-category-form");
+        const addButtonForm = document.getElementById("add-button-form");
+        const toast = document.getElementById("toast");
+        const toastMessage = document.getElementById("toast-message");
+        const userProfile = document.getElementById("user-profile");
+        const aiSuggestions = document.getElementById("ai-suggestions");
+        const backFromAiBtn = document.getElementById("back-from-ai");
+        const loadingSuggestions = document.getElementById(
+          "loading-suggestions"
+        );
+        const suggestionButtons = document.getElementById("suggestion-buttons");
+        const aiPromptInput = document.getElementById("ai-prompt");
+        const getAiSuggestionsBtn =
+          document.getElementById("get-ai-suggestions");
+
+        // Sample data
+        const sampleCategories = [
+          { id: 1, name: "Basic Needs", icon: "hand" },
+          { id: 2, name: "Food & Drink", icon: "utensils" },
+          { id: 3, name: "Feelings", icon: "heart" },
+          { id: 4, name: "Health", icon: "medkit" },
+          { id: 5, name: "People", icon: "user-friends" },
+          { id: 6, name: "Places", icon: "map-marker-alt" },
+        ];
+
+        const sampleButtons = {
+          1: [
+            // Basic Needs
+            { id: 101, text: "I need help", icon: "hand", voice: "Sarah" },
+            {
+              id: 102,
+              text: "I need to use the bathroom",
+              icon: "toilet",
+              voice: "Sarah",
+            },
+            {
+              id: 103,
+              text: "I need water",
+              icon: "glass-water",
+              voice: "Sarah",
+            },
+            { id: 104, text: "I am tired", icon: "bed", voice: "Sarah" },
+            { id: 105, text: "Yes", icon: "thumbs-up", voice: "Sarah" },
+            { id: 106, text: "No", icon: "thumbs-down", voice: "Sarah" },
+          ],
+          2: [
+            // Food & Drink
+            { id: 201, text: "I am hungry", icon: "utensils", voice: "Sarah" },
+            {
+              id: 202,
+              text: "I am thirsty",
+              icon: "glass-water",
+              voice: "Sarah",
+            },
+            {
+              id: 203,
+              text: "I would like coffee",
+              icon: "mug-hot",
+              voice: "Sarah",
+            },
+            {
+              id: 204,
+              text: "I would like tea",
+              icon: "mug-hot",
+              voice: "Sarah",
+            },
+          ],
+          3: [
+            // Feelings
+            { id: 301, text: "I am happy", icon: "smile", voice: "Sarah" },
+            { id: 302, text: "I am sad", icon: "frown", voice: "Sarah" },
+            { id: 303, text: "I am angry", icon: "angry", voice: "Sarah" },
+            { id: 304, text: "I am tired", icon: "bed", voice: "Sarah" },
+          ],
+          4: [
+            // Health
+            { id: 401, text: "I am in pain", icon: "pills", voice: "Sarah" },
+            { id: 402, text: "I need medicine", icon: "pills", voice: "Sarah" },
+            { id: 403, text: "Call a doctor", icon: "user-md", voice: "Sarah" },
+            { id: 404, text: "Emergency", icon: "ambulance", voice: "Sarah" },
+          ],
+        };
+
+        const quickAccess = [
+          { id: 101, text: "I need help", icon: "hand", voice: "Sarah" },
+          { id: 105, text: "Yes", icon: "thumbs-up", voice: "Sarah" },
+          { id: 106, text: "No", icon: "thumbs-down", voice: "Sarah" },
+          { id: 401, text: "I am in pain", icon: "pills", voice: "Sarah" },
+          { id: 404, text: "Emergency", icon: "ambulance", voice: "Sarah" },
+        ];
+
+        // Initialize app
+        function initApp() {
+          // Simulate splash screen loading
+          setTimeout(() => {
+            splashScreen.classList.add("fade-out");
+            setTimeout(() => {
+              splashScreen.style.display = "none";
+              authScreen.classList.remove("hidden");
+              authScreen.classList.add("fade-in");
+            }, 500);
+          }, 2000);
+
+          // Auth tabs switching
+          loginTab.addEventListener("click", () => {
+            loginTab.classList.add("border-indigo-600", "text-indigo-600");
+            loginTab.classList.remove("border-transparent", "text-gray-500");
+            registerTab.classList.remove(
+              "border-indigo-600",
+              "text-indigo-600"
+            );
+            registerTab.classList.add("border-transparent", "text-gray-500");
+            loginForm.classList.remove("hidden");
+            registerForm.classList.add("hidden");
+          });
+
+          registerTab.addEventListener("click", () => {
+            registerTab.classList.add("border-indigo-600", "text-indigo-600");
+            registerTab.classList.remove("border-transparent", "text-gray-500");
+            loginTab.classList.remove("border-indigo-600", "text-indigo-600");
+            loginTab.classList.add("border-transparent", "text-gray-500");
+            registerForm.classList.remove("hidden");
+            loginForm.classList.add("hidden");
+          });
+
+          // Form submissions
+          loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+
+            // Simulate login - in a real app, this would call an auth API
+            startDemoSession(email.split("@")[0]);
+          });
+
+          registerForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const name = document.getElementById("register-name").value;
+            const email = document.getElementById("register-email").value;
+            const password = document.getElementById("register-password").value;
+            const details = document.getElementById("user-details").value;
+
+            // Simulate registration with AI personalization
+            startDemoSession(name, details);
+          });
+
+          // Demo button
+          demoBtn.addEventListener("click", () => {
+            startDemoSession("Demo User");
+          });
+
+          // Add category button
+          addCategoryBtn.addEventListener("click", () => {
+            openModal(addCategoryModal);
+          });
+
+          // Back buttons
+          backToCategoriesBtn.addEventListener("click", () => {
+            categoryView.classList.add("hidden");
+            appScreen.classList.remove("hidden");
+            appState.selectedCategory = null;
+          });
+
+          backFromAiBtn.addEventListener("click", () => {
+            aiSuggestions.classList.add("hidden");
+            appScreen.classList.remove("hidden");
+          });
+
+          // Add button
+          addButtonBtn.addEventListener("click", () => {
+            openModal(addButtonModal);
+          });
+
+          // Close modal buttons
+          document.querySelectorAll(".close-modal").forEach((button) => {
+            button.addEventListener("click", () => {
+              closeAllModals();
+            });
+          });
+
+          // Form submissions
+          addCategoryForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const name = document.getElementById("category-name").value;
+            const icon = document.getElementById("category-icon").value;
+
+            // Add new category
+            const newId = appState.categories.length + 100;
+            const newCategory = { id: newId, name, icon };
+            appState.categories.push(newCategory);
+            renderCategories();
+
+            // Initialize empty button array for this category
+            if (!sampleButtons[newId]) {
+              sampleButtons[newId] = [];
+            }
+
+            closeAllModals();
+            showToast("Category added successfully", "success");
+          });
+
+          addButtonForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const text = document.getElementById("button-text").value;
+            const icon = document.getElementById("button-icon").value;
+            const voice = document.getElementById("button-voice").value;
+
+            if (appState.selectedCategory) {
+              // Add new button to the selected category
+              const categoryId = appState.selectedCategory.id;
+              const newId = Date.now(); // Simple unique ID
+              const newButton = { id: newId, text, icon, voice };
+
+              if (!sampleButtons[categoryId]) {
+                sampleButtons[categoryId] = [];
+              }
+
+              sampleButtons[categoryId].push(newButton);
+              renderCategoryButtons(appState.selectedCategory);
+
+              closeAllModals();
+              showToast("Button added successfully", "success");
+            }
+          });
+
+          // AI suggestion button
+          getAiSuggestionsBtn.addEventListener("click", () => {
+            const prompt = aiPromptInput.value.trim();
+            if (prompt) {
+              loadingSuggestions.classList.remove("hidden");
+              suggestionButtons.classList.add("hidden");
+
+              // Get AI suggestions
+              getAISuggestions(prompt);
+            }
+          });
+
+          // User profile - show AI suggestions
+          userProfile.addEventListener("click", () => {
+            appScreen.classList.add("hidden");
+            aiSuggestions.classList.remove("hidden");
+
+            // Only fetch AI suggestions if they haven't been loaded yet
+            if (suggestionButtons.children.length === 0) {
+              loadingSuggestions.classList.remove("hidden");
+              suggestionButtons.classList.add("hidden");
+              getAISuggestions(
+                "Suggest communication buttons for a person with speech disability"
+              );
+            }
+          });
+
+          // Initialize sample data for demo
+          appState.categories = [...sampleCategories];
+          appState.quickAccessButtons = [...quickAccess];
+        }
+
+        // Start a demo session
+        function startDemoSession(username, userDetails = "") {
+          authScreen.classList.add("fade-out");
+          setTimeout(() => {
+            authScreen.classList.add("hidden");
+            appScreen.classList.remove("hidden");
+            appScreen.classList.add("fade-in");
+
+            // Update user state
+            appState.currentUser = { name: username };
+            appState.isDemo = true;
+
+            // Update UI with user info
+            updateUserInfo(username);
+
+            // Render app content
+            renderCategories();
+            renderQuickAccessButtons();
+
+            // If user provided details, get AI suggestions
+            if (userDetails) {
+              setTimeout(() => {
+                showToast("AI is personalizing your experience...", "info");
+                setTimeout(() => {
+                  userProfile.click();
+                }, 1500);
+              }, 1000);
+            }
+          }, 500);
+        }
+
+        // Update user info in the UI
+        function updateUserInfo(name) {
+          const userProfileName = userProfile.querySelector("span");
+          if (userProfileName) {
+            userProfileName.textContent = name;
+          }
+        }
+
+        // Render categories
+        function renderCategories() {
+          categoriesContainer.innerHTML = "";
+
+          appState.categories.forEach((category) => {
+            const categoryElement = document.createElement("div");
+            categoryElement.className = "speech-category slide-up";
+            categoryElement.innerHTML = `
+            <i class="fas fa-${category.icon}"></i>
+            <span>${category.name}</span>
+          `;
+
+            categoryElement.addEventListener("click", () => {
+              appState.selectedCategory = category;
+              showCategoryView(category);
+            });
+
+            categoriesContainer.appendChild(categoryElement);
+          });
+        }
+
+        // Render quick access buttons
+        function renderQuickAccessButtons() {
+          quickAccessButtons.innerHTML = "";
+
+          appState.quickAccessButtons.forEach((button) => {
+            const buttonElement = createSpeechButton(button);
+            quickAccessButtons.appendChild(buttonElement);
+          });
+        }
+
+        // Show category view
+        function showCategoryView(category) {
+          categoryTitle.textContent = category.name;
+          renderCategoryButtons(category);
+
+          appScreen.classList.add("hidden");
+          categoryView.classList.remove("hidden");
+        }
+
+        // Render category buttons
+        function renderCategoryButtons(category) {
+          categoryButtons.innerHTML = "";
+
+          const buttons = sampleButtons[category.id] || [];
+
+          buttons.forEach((button) => {
+            const buttonElement = createSpeechButton(button);
+            categoryButtons.appendChild(buttonElement);
+          });
+
+          // Add "add button" button if there are no buttons yet
+          if (buttons.length === 0) {
+            const emptyState = document.createElement("div");
+            emptyState.className = "col-span-full text-center py-8";
+            emptyState.innerHTML = `
+            <i class="fas fa-comment-slash text-4xl text-gray-400 mb-3"></i>
+            <p class="text-gray-500 dark:text-gray-400 mb-4">No buttons added yet</p>
+          `;
+            categoryButtons.appendChild(emptyState);
+          }
+        }
+
+        // Create a speech button element
+        function createSpeechButton(button) {
+          const buttonElement = document.createElement("div");
+          buttonElement.className = "speech-button slide-up";
+          buttonElement.innerHTML = `
+          <i class="fas fa-${button.icon}"></i>
+          <span class="text-sm">${button.text}</span>
+        `;
+
+          buttonElement.addEventListener("click", () => {
+            // Show active state
+            buttonElement.classList.add("active");
+
+            // Speak the text
+            speakText(button.text, button.voice || appState.defaultVoice);
+
+            // Remove active state after animation
+            setTimeout(() => {
+              buttonElement.classList.remove("active");
+            }, 1000);
+          });
+
+          return buttonElement;
+        }
+
+        // Speak text using ElevenLabs API
+        function speakText(text, voice) {
+          // Show loading state
+          showToast("Generating speech...", "info");
+
+          // Construct prompt for ElevenLabs
+          const prompt = `@ElevenLabs ${text} --voice ${voice}`;
+
+          // We'll use a handler to process the response
+          const handlerId = `speech-handler-${Date.now()}`;
+
+          window.Poe.registerHandler(handlerId, (result) => {
+            if (result.status === "error") {
+              showToast("Error generating speech", "error");
+              console.error("Error:", result);
+              return;
+            }
+
+            if (result.status === "complete") {
+              const msg = result.responses[0];
+
+              if (msg.attachments?.length > 0) {
+                const audioAttachment = msg.attachments[0];
+
+                // Create and play audio element
+                const audio = new Audio(audioAttachment.url);
+                audio.play();
+
+                showToast("Playing audio", "success");
+              } else {
+                showToast("No audio generated", "error");
+              }
+            }
+          });
+
+          // Send request to ElevenLabs
+          window.Poe.sendUserMessage(prompt, {
+            handler: handlerId,
+            stream: false,
+            openChat: false,
+          }).catch((err) => {
+            console.error("Error sending message:", err);
+            showToast("Error: " + err.message, "error");
+          });
+        }
+
+        // Get AI suggestions
+        function getAISuggestions(prompt) {
+          // Define handler for Claude's response
+          const handlerId = `ai-suggestions-handler-${Date.now()}`;
+
+          window.Poe.registerHandler(handlerId, (result) => {
+            if (result.status === "error") {
+              showToast("Error getting AI suggestions", "error");
+              loadingSuggestions.classList.add("hidden");
+              return;
+            }
+
+            if (result.status === "complete") {
+              const msg = result.responses[0];
+              processAISuggestions(msg.content);
+            }
+          });
+
+          // Ask Claude for personalized suggestions
+          const aiPrompt = `@Claude-3.7-Sonnet 
+        I need you to provide button suggestions for an AAC (Augmentative and Alternative Communication) app
+        for a person with speech disabilities. For context: ${prompt}
+        
+        Provide ONLY raw JSON in your response with no explanations, additional text, or code block formatting (no \`\`\`).
+        
+        Return a JSON array with 6-8 button objects in this format:
+        [
+          {
+            "text": "Short phrase to speak",
+            "icon": "icon-name",
+            "category": "Category name"
+          }
+        ]
+        
+        For icon-name, use only these options: utensils, glass-water, mug-hot, toilet, bed, smile, frown, angry, hand, 
+        clock, phone, tv, music, book, temperature-high, temperature-low, pills, ambulance, thumbs-up, thumbs-down
+        
+        Make sure the suggestions are practical, useful, and appropriate for someone with speech difficulties.`;
+
+          window.Poe.sendUserMessage(aiPrompt, {
+            handler: handlerId,
+            stream: false,
+            openChat: false,
+          }).catch((err) => {
+            console.error("Error sending message:", err);
+            showToast("Error: " + err.message, "error");
+            loadingSuggestions.classList.add("hidden");
+          });
+        }
+
+        // Process AI suggestions
+        function processAISuggestions(content) {
+          try {
+            // Try to parse JSON from the content
+            const buttons = JSON.parse(content);
+
+            if (Array.isArray(buttons) && buttons.length > 0) {
+              // Clear existing buttons
+              suggestionButtons.innerHTML = "";
+
+              // Create a button for each suggestion
+              buttons.forEach((button) => {
+                const buttonElement = document.createElement("div");
+                buttonElement.className = "speech-button slide-up";
+                buttonElement.innerHTML = `
+                <i class="fas fa-${button.icon || "comment"}"></i>
+                <span class="text-sm">${button.text}</span>
+                ${
+                  button.category
+                    ? `<span class="text-xs text-gray-500 mt-1">${button.category}</span>`
+                    : ""
+                }
+              `;
+
+                // Add click event to add this button to a category
+                buttonElement.addEventListener("click", () => {
+                  // Find or create the category
+                  let categoryId;
+                  const existingCategory = appState.categories.find(
+                    (c) =>
+                      c.name.toLowerCase() === button.category.toLowerCase()
+                  );
+
+                  if (existingCategory) {
+                    categoryId = existingCategory.id;
+                  } else {
+                    // Create new category
+                    const newId = appState.categories.length + 100;
+                    const categoryIcon = getCategoryIcon(button.category);
+                    const newCategory = {
+                      id: newId,
+                      name: button.category,
+                      icon: categoryIcon,
+                    };
+                    appState.categories.push(newCategory);
+                    categoryId = newId;
+
+                    // Initialize empty button array
+                    if (!sampleButtons[categoryId]) {
+                      sampleButtons[categoryId] = [];
+                    }
+
+                    renderCategories();
+                  }
+
+                  // Add button to category
+                  const newId = Date.now();
+                  const newButton = {
+                    id: newId,
+                    text: button.text,
+                    icon: button.icon || "comment",
+                    voice: appState.defaultVoice,
+                  };
+
+                  sampleButtons[categoryId].push(newButton);
+
+                  // Also add to quick access if it's one of the first suggestions
+                  if (appState.quickAccessButtons.length < 8) {
+                    appState.quickAccessButtons.push(newButton);
+                    renderQuickAccessButtons();
+                  }
+
+                  // Show toast
+                  showToast("Button added to " + button.category, "success");
+
+                  // Animate button to show it was added
+                  buttonElement.classList.add("active");
+                  setTimeout(() => {
+                    buttonElement.classList.remove("active");
+                  }, 1000);
+                });
+
+                suggestionButtons.appendChild(buttonElement);
+              });
+
+              // Show suggestions
+              loadingSuggestions.classList.add("hidden");
+              suggestionButtons.classList.remove("hidden");
+            } else {
+              throw new Error("Invalid suggestions format");
+            }
+          } catch (err) {
+            console.error("Error processing AI suggestions:", err);
+            loadingSuggestions.classList.add("hidden");
+            showToast("Error processing AI suggestions", "error");
+          }
+        }
+
+        // Get appropriate icon for a category
+        function getCategoryIcon(categoryName) {
+          const name = categoryName.toLowerCase();
+
+          if (
+            name.includes("food") ||
+            name.includes("eat") ||
+            name.includes("drink")
+          )
+            return "utensils";
+          if (name.includes("feel") || name.includes("emotion")) return "heart";
+          if (name.includes("home") || name.includes("house")) return "home";
+          if (name.includes("travel") || name.includes("transport"))
+            return "car";
+          if (name.includes("health") || name.includes("medical"))
+            return "medkit";
+          if (
+            name.includes("people") ||
+            name.includes("person") ||
+            name.includes("family")
+          )
+            return "user-friends";
+          if (
+            name.includes("shop") ||
+            name.includes("store") ||
+            name.includes("buy")
+          )
+            return "store";
+          if (
+            name.includes("talk") ||
+            name.includes("chat") ||
+            name.includes("convers")
+          )
+            return "comments";
+          if (name.includes("place") || name.includes("location"))
+            return "map-marker-alt";
+          if (
+            name.includes("time") ||
+            name.includes("schedule") ||
+            name.includes("date")
+          )
+            return "calendar-alt";
+          if (
+            name.includes("school") ||
+            name.includes("learn") ||
+            name.includes("educat")
+          )
+            return "graduation-cap";
+          if (
+            name.includes("work") ||
+            name.includes("job") ||
+            name.includes("office")
+          )
+            return "briefcase";
+          if (
+            name.includes("fun") ||
+            name.includes("entertain") ||
+            name.includes("game")
+          )
+            return "gamepad";
+
+          // Default icon for other categories
+          return "folder";
+        }
+
+        // Show toast notification
+        function showToast(message, type = "info") {
+          toastMessage.textContent = message;
+          toast.className = "toast";
+
+          if (type === "success") {
+            toast.classList.add("success");
+            toast.querySelector("i").className =
+              "fas fa-check-circle text-green-500";
+          } else if (type === "error") {
+            toast.classList.add("error");
+            toast.querySelector("i").className =
+              "fas fa-exclamation-circle text-red-500";
+          } else {
+            toast.classList.add("info");
+            toast.querySelector("i").className =
+              "fas fa-info-circle text-blue-500";
+          }
+
+          toast.classList.add("show");
+
+          setTimeout(() => {
+            toast.classList.remove("show");
+          }, 3000);
+        }
+
+        // Modal functions
+        function openModal(modal) {
+          modal.classList.add("show");
+        }
+
+        function closeAllModals() {
+          document.querySelectorAll(".modal").forEach((modal) => {
+            modal.classList.remove("show");
+          });
+
+          // Reset forms
+          document.querySelectorAll("form").forEach((form) => {
+            form.reset();
+          });
+        }
+
+        // Click outside to close modals
+        window.addEventListener("click", (e) => {
+          document.querySelectorAll(".modal.show").forEach((modal) => {
+            if (e.target === modal) {
+              modal.classList.remove("show");
+            }
+          });
+        });
+
+        // Initialize the app
+        initApp();
+      });
+    </script>
+  </body>
+</html>

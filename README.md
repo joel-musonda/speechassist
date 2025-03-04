@@ -109,7 +109,7 @@ Build project and start storybook on [localhost](http://localhost:9009):
 ## Contributing
 
 All contributions are welcome!  
-Please review contribution guidelines: [Pull Requests](.github/pull_request_template.md) | [Issues](https://github.com/mkosir/react-parallax-tilt/issues/new/choose)
+
 
 [npm-url]: https://www.npmjs.com/package/react-parallax-tilt
 [npm-badge]: https://img.shields.io/npm/v/react-parallax-tilt.svg
